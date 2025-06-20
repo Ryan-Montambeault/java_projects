@@ -1,0 +1,103 @@
+public class AVLTree<K extends Comparable<K>, V> {
+
+    private static class AVLNode<K, V> {
+        K key;
+        V value;
+        AVLNode<K, V> left, right;
+        int height;
+
+        AVLNode(K key, V value) {
+            this.key = key;
+            this.value = value;
+            this.height = 1;
+        }
+    }
+
+    private AVLNode<K, V> root;
+    private int size;
+
+    // public api methods
+    public void insert(K key, V value) {
+        root = insertRecursive(root, key, value);
+    }
+
+
+    // private helper functions
+    private AVLNode<K, V> insertRecursive(AVLNode<K, V> node, K key, V value) {
+        if (node == null) return new AVLNode<>(key, value); // create leaf if node is null
+
+        int cmp = key.compareTo(node.key); // compare keys
+        if (cmp < 0) node.left = insertRecursive(node.left, key, value); // traverse left
+        else if (cmp > 0) node.right = insertRecursive(node.right, key, value); // traverse right
+        else return node; // refuse duplicate
+
+        // update height and rebalance AVL if needed
+        updateHeight(node);
+        return balance(node);
+    }
+
+    private void updateHeight(AVLNode<K, V> node) {
+        // get left and right subtree heights
+        int leftHeight = (node.left != null) ? node.left.height : 0;
+        int rightHeight = (node.right != null) ? node.right.height : 0;
+        // update height
+        node.height = 1 + (leftHeight > rightHeight ? leftHeight : rightHeight);
+    }
+
+    private AVLNode<K, V> balance(AVLNode<K, V> node) {
+        // calculate balance factor
+        int bf = balanceFactor(node);
+
+        // fix imbalances
+        if (bf > 1) { // left-heavy
+            if (balanceFactor(node.left) < 0) node.left = rotateLeft(node.left);
+            return rotateRight(node);
+        }
+        if (bf < -1) { // right-heavy
+            if (balanceFactor(node.right) > 0) node.right = rotateRight(node.right);
+            return rotateLeft(node);
+        }
+
+        // no imbalances left - return original node
+        return node;
+    }
+
+    private int balanceFactor(AVLNode<K, V> node) {
+        // get left and right subtree heights
+        int leftHeight = (node.left != null) ? node.left.height : 0;
+        int rightHeight = (node.right != null) ? node.right.height : 0;
+        // calculate balance factor using left and right heights
+        int bf = leftHeight - rightHeight;
+        return bf;
+    }
+
+    private AVLNode<K, V> rotateLeft(AVLNode<K, V> x) {
+        AVLNode<K, V> y = x.right;
+        AVLNode<K, V> T2 = y.left;
+
+        // rotation
+        y.left = x;
+        x.right = T2;
+
+        // update heights
+        updateHeight(x);
+        updateHeight(y);
+
+        return y; // new root
+    }
+
+    private AVLNode<K, V> rotateRight(AVLNode<K, V> y) {
+        AVLNode<K, V> x = y.left;
+        AVLNode<K, V> T2 = x.right;
+
+        // rotation
+        x.right = y;
+        y.left = T2;
+
+        // update heights
+        updateHeight(y);
+        updateHeight(x);
+
+        return x; // new root
+    }
+}
