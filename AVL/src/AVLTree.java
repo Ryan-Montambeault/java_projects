@@ -21,6 +21,11 @@ public class AVLTree<K extends Comparable<K>, V> {
         root = insertRecursive(root, key, value);
     }
 
+    public V get(K key) {
+        AVLNode<K, V> node = getRecursive(root, key);
+        return (node != null) ? node.value : null;
+    }
+
 
     // private helper functions
     private AVLNode<K, V> insertRecursive(AVLNode<K, V> node, K key, V value) {
@@ -99,5 +104,14 @@ public class AVLTree<K extends Comparable<K>, V> {
         updateHeight(x);
 
         return x; // new root
+    }
+
+    private AVLNode<K, V> getRecursive(AVLNode<K, V> node, K key) {
+        if (node == null) return null;
+
+        int cmp = key.compareTo(node.key); // compare keys
+        if (cmp < 0) return getRecursive(node.left, key); // traverse left
+        else if (cmp > 0) return getRecursive(node.right, key); // traverse right
+        else return node; // key found
     }
 }
