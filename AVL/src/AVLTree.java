@@ -5,6 +5,7 @@ public class AVLTree<K extends Comparable<K>, V> {
         V value;
         AVLNode<K, V> left, right;
         int height;
+        private int size = 0;
 
         AVLNode(K key, V value) {
             this.key = key;
@@ -16,9 +17,13 @@ public class AVLTree<K extends Comparable<K>, V> {
     private AVLNode<K, V> root;
     private int size;
 
-    // public api methods
+    // ---------- public api methods ----------
     public void insert(K key, V value) {
         root = insertRecursive(root, key, value);
+    }
+
+    public int getSize() {
+        return size;
     }
 
     public V get(K key) {
@@ -26,10 +31,21 @@ public class AVLTree<K extends Comparable<K>, V> {
         return (node != null) ? node.value : null;
     }
 
+    public void inOrder(Visitor<K, V> visitor) {
+        inOrderRecursive(root, visitor);
+    }
 
-    // private helper functions
+    public void remove(K key) {
+        root = removeRecursive(root, key);
+    }
+
+
+    // ---------- private helper functions ----------
     private AVLNode<K, V> insertRecursive(AVLNode<K, V> node, K key, V value) {
-        if (node == null) return new AVLNode<>(key, value); // create leaf if node is null
+        if (node == null) {
+            size++;
+            return new AVLNode<>(key, value); // create leaf if node is null
+        }
 
         int cmp = key.compareTo(node.key); // compare keys
         if (cmp < 0) node.left = insertRecursive(node.left, key, value); // traverse left
@@ -113,5 +129,44 @@ public class AVLTree<K extends Comparable<K>, V> {
         if (cmp < 0) return getRecursive(node.left, key); // traverse left
         else if (cmp > 0) return getRecursive(node.right, key); // traverse right
         else return node; // key found
+    }
+
+    private void inOrderRecursive(AVLNode<K, V> node, Visitor<K, V> visitor) {
+        if (node == null) return;
+        inOrderRecursive(node.left, visitor);
+        visitor.visit(node.key, node.value);
+        inOrderRecursive(node.right, visitor);
+    }
+
+    private AVLNode<K, V> removeRecursive(AVLNode<K, V> node, K key) {
+        if (node == null) return null;
+
+        int cmp = key.compareTo(node.key); // compare keys
+        if (cmp < 0) node.left = removeRecursive(node.left, key); // traverse left
+        else if (cmp > 0) node.right = removeRecursive(node.right, key); // traverse right
+        else {
+            // found node to delete
+            if (node.left == null || node.right == null) {
+                size--;
+                node = (node.left != null) ? node.left : node.right;
+            } else {
+                AVLNode<K, V> successor = minValueNode(node.right); // locate successor
+                node.key = successor.key; // replace key
+                node.value = successor.value; // replace value
+                node.right = removeRecursive(node.right, successor.key); // remove successor
+            }
+        }
+
+        if (node == null) return null;
+        updateHeight(node); // update height
+        return balance(node); // rebalance AVL if necessary
+    }
+
+    private AVLNode<K, V> minValueNode(AVLNode<K, V> node) {
+        AVLNode<K, V> current = node;
+        while (current.left != null) {
+            current = current.left;
+        }
+        return current;
     }
 }
