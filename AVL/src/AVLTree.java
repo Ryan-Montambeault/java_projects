@@ -14,6 +14,10 @@ public class AVLTree<K extends Comparable<K>, V> {
         }
     }
 
+    public interface Visitor<K, V> {
+        void visit(K key, V value);
+    }
+
     private AVLNode<K, V> root;
     private int size;
 
