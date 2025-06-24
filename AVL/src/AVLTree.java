@@ -39,6 +39,15 @@ public class AVLTree<K extends Comparable<K>, V> {
         root = removeRecursive(root, key);
     }
 
+    public void clear() {
+        root = null;
+        size = 0;
+    }
+
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
 
     // ---------- private helper functions ----------
     private AVLNode<K, V> insertRecursive(AVLNode<K, V> node, K key, V value) {

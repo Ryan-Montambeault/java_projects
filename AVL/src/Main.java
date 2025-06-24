@@ -32,5 +32,11 @@ public class Main {
         }
         System.out.println("Current users in system:");
         tree.inOrder((key, value) -> System.out.println(key + ": " + value));
+
+        // testing clear
+        System.out.println("Clearing users from system...");
+        tree.clear();
+        if (tree.isEmpty()) System.out.println("Users cleared");
+        else System.out.println("Failed to clear users");
     }
 }
