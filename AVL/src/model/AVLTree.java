@@ -1,3 +1,5 @@
+package model;
+
 public class AVLTree<K extends Comparable<K>, V> {
 
     private static class AVLNode<K, V> {
